@@ -1,0 +1,7 @@
+FROM postgres:15.1-alpine
+
+ENV TZ="Europe/Vilnius"
+RUN date
+
+
+COPY /build/docker/postgres/init.sql /docker-entrypoint-initdb.d/

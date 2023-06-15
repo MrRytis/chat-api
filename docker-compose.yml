@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: ./build/docker/postgres/dockerfile
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+  cache:
+    container_name: redis
+    build:
+        context: .
+        dockerfile: ./build/docker/redis/dockerfile
+    restart: always
+    environment:
+      - TZ=Europe/Vilnius
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis:/data
+volumes:
+  postgres:
+    driver: local
+  redis:
+      driver: local
