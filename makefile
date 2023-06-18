@@ -18,3 +18,8 @@ down:
 
 build:
 	docker-compose build
+
+docs:
+	swag init
+
+.PHONY: run migration_up migration_down migration_generate up down build docs
