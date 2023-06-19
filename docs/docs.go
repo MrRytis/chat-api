@@ -66,6 +66,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Error"
                         }
                     },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -105,6 +111,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
                         "schema": {
                             "$ref": "#/definitions/response.Error"
                         }
@@ -161,6 +173,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Error"
                         }
                     },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -207,6 +225,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Error"
                         }
                     },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -220,17 +244,26 @@ const docTemplate = `{
     "definitions": {
         "request.Login": {
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 8
                 }
             }
         },
         "request.Logout": {
             "type": "object",
+            "required": [
+                "refreshToken"
+            ],
             "properties": {
                 "refreshToken": {
                     "type": "string"
@@ -239,6 +272,10 @@ const docTemplate = `{
         },
         "request.Refresh": {
             "type": "object",
+            "required": [
+                "accessToken",
+                "refreshToken"
+            ],
             "properties": {
                 "accessToken": {
                     "type": "string"
@@ -250,15 +287,24 @@ const docTemplate = `{
         },
         "request.Register": {
             "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 108,
+                    "minLength": 3
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 8
                 }
             }
         },

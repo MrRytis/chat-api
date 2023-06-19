@@ -6,6 +6,7 @@ import (
 	"github.com/MrRytis/chat-api/internal/repository"
 	"github.com/MrRytis/chat-api/internal/service/authService"
 	"github.com/MrRytis/chat-api/internal/service/userService"
+	"github.com/MrRytis/chat-api/internal/utils"
 	"github.com/gofiber/fiber/v2"
 	"time"
 )
@@ -19,12 +20,18 @@ import (
 // @Param        req body request.Register true "register"
 // @Success      201  {object}  response.Register
 // @Failure      400  {object}  response.Error
+// @Failure      422  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/auth/register [post]
 func Register(c *fiber.Ctx) error {
 	req := new(request.Register)
 	if err := c.BodyParser(req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse JSON body")
+	}
+
+	err := utils.ValidateRequest(req)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
 	}
 
 	hashedPassword, err := authService.HashPassword(req.Password)
@@ -50,6 +57,7 @@ func Register(c *fiber.Ctx) error {
 // @Param        req body request.Login true "login"
 // @Success      200  {object}  response.Auth
 // @Failure      400  {object}  response.Error
+// @Failure      422  {object}  response.Error
 // @Failure      403  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/auth/login [post]
@@ -57,6 +65,11 @@ func Login(c *fiber.Ctx) error {
 	req := new(request.Login)
 	if err := c.BodyParser(req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse JSON body")
+	}
+
+	err := utils.ValidateRequest(req)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
 	}
 
 	user := repository.FindUserByEmail(req.Email)
@@ -84,10 +97,16 @@ func Login(c *fiber.Ctx) error {
 // @Param        req body request.Logout true "logout"
 // @Success      204  {object}  nil
 // @Failure      400  {object}  response.Error
+// @Failure      422  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/auth/logout [post]
 func Logout(c *fiber.Ctx) error {
 	req := new(request.Logout)
+
+	err := utils.ValidateRequest(req)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
+	}
 
 	if err := c.BodyParser(req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse JSON body")
@@ -108,11 +127,17 @@ func Logout(c *fiber.Ctx) error {
 // @Param        req body request.Refresh true "refresh"
 // @Success      200  {object}  response.Auth
 // @Failure      400  {object}  response.Error
+// @Failure      422  {object}  response.Error
 // @Failure      403  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/auth/refresh [post]
 func Refresh(c *fiber.Ctx) error {
 	req := new(request.Refresh)
+
+	err := utils.ValidateRequest(req)
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
+	}
 
 	if err := c.BodyParser(req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse JSON body")

@@ -5,12 +5,19 @@ definitions:
       email:
         type: string
       password:
+        maxLength: 32
+        minLength: 8
         type: string
+    required:
+    - email
+    - password
     type: object
   request.Logout:
     properties:
       refreshToken:
         type: string
+    required:
+    - refreshToken
     type: object
   request.Refresh:
     properties:
@@ -18,15 +25,26 @@ definitions:
         type: string
       refreshToken:
         type: string
+    required:
+    - accessToken
+    - refreshToken
     type: object
   request.Register:
     properties:
       email:
         type: string
       name:
+        maxLength: 108
+        minLength: 3
         type: string
       password:
+        maxLength: 32
+        minLength: 8
         type: string
+    required:
+    - email
+    - name
+    - password
     type: object
   response.Auth:
     properties:
@@ -90,6 +108,10 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/response.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Error'
         "500":
           description: Internal Server Error
           schema:
@@ -116,6 +138,10 @@ paths:
           description: No Content
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+        "422":
+          description: Unprocessable Entity
           schema:
             $ref: '#/definitions/response.Error'
         "500":
@@ -152,6 +178,10 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/response.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Error'
         "500":
           description: Internal Server Error
           schema:
@@ -180,6 +210,10 @@ paths:
             $ref: '#/definitions/response.Register'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+        "422":
+          description: Unprocessable Entity
           schema:
             $ref: '#/definitions/response.Error'
         "500":

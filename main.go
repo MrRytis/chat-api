@@ -2,9 +2,11 @@ package main
 
 import (
 	_ "github.com/MrRytis/chat-api/docs"
+	"github.com/MrRytis/chat-api/internal/handler"
 	"github.com/MrRytis/chat-api/internal/router"
 	"github.com/MrRytis/chat-api/internal/utils"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/swagger"
 	"github.com/joho/godotenv"
 	"log"
@@ -25,11 +27,16 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: handler.ErrorHandler,
+	})
+
+	app.Use(recover.New())
 
 	utils.NewDb()
 	utils.NewCache()
 
+	// Swagger
 	app.Get("/*", swagger.HandlerDefault)
 
 	router.NewRouter(app)
