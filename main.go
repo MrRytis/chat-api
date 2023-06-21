@@ -37,7 +37,7 @@ func main() {
 	utils.NewCache()
 
 	// Swagger
-	app.Get("/*", swagger.HandlerDefault)
+	app.Get("/docs/*", swagger.HandlerDefault)
 
 	router.NewRouter(app)
 

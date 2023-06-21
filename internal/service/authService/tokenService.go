@@ -23,7 +23,7 @@ func CreateAccessToken(user entity.User) string {
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString(os.Getenv("JWT_SECRET"))
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func ParseJWT(tokenString string) (jwt.MapClaims, error) {
 		}
 
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return os.Getenv("JWT_SECRET"), nil
+		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -91,10 +91,10 @@ func IsBlacklisted(token string) bool {
 	var value bool
 	val := utils.GetFromCache(blackListKey(token), value)
 	if val != nil {
-		return false
+		return true
 	}
 
-	return true
+	return false
 }
 
 func ExpireRefreshToken(userId uint, token string) {

@@ -19,10 +19,10 @@ func NewRouter(app *fiber.App) {
 
 	group := apiV1.Group("/group", middleware.Auth)
 	group.Post("/create", handler.CreateGroup)
-	group.Get("/list", handler.GetGroupList)
+	apiV1.Get("/groups", middleware.Auth, handler.GetGroupList)
 	group.Get("/:group", handler.GetGroup)
 	group.Put("/:group", handler.UpdateGroup)
 	group.Delete("/:group", handler.DeleteGroup)
 	group.Post("/:group/add", handler.AddUserToGroup)
-	group.Post("/:group/remove/:user", handler.RemoveUserFromGroup)
+	group.Delete("/:group/remove/:user", handler.RemoveUserFromGroup)
 }
