@@ -84,3 +84,10 @@ func UpdateGroup(group *entity.Group) *entity.Group {
 
 	return group
 }
+
+func DeleteGroup(group entity.Group) {
+	err := utils.Db.Delete(&group).Error
+	if err != nil {
+		log.Fatal(err, "Error deleting group")
+	}
+}

@@ -8,5 +8,5 @@ type Group struct {
 	Users   []User `gorm:"many2many:group_users;"`
 	Uuid    string `gorm:"unique"`
 	Admin   User   `gorm:"foreignKey:admin_id"`
-	AdminId uint   `gorm:"not null"`
+	AdminId int32  `gorm:"not null"`
 }

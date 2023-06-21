@@ -16,7 +16,7 @@ func BuildGroup(name string, userId int32) entity.Group {
 		Name:    name,
 		Uuid:    uuid.New().String(),
 		Admin:   *admin,
-		AdminId: admin.ID,
+		AdminId: int32(admin.ID),
 		Users:   users,
 	}
 }
