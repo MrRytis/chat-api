@@ -270,7 +270,68 @@ paths:
       summary: Register new user
       tags:
       - Auth
-  /api/v1/group/{uuid}:
+  /api/v1/groups:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated group list
+      parameters:
+      - description: default 1
+        in: query
+        name: page
+        type: integer
+      - description: default 20
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.GroupList'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Get group list
+      tags:
+      - Group
+    post:
+      consumes:
+      - application/json
+      description: creates new group
+      parameters:
+      - description: create group
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateGroup'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Group'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Create new group
+      tags:
+      - Group
+  /api/v1/groups/{uuid}:
     delete:
       consumes:
       - application/json
@@ -363,7 +424,7 @@ paths:
       summary: Update group
       tags:
       - Group
-  /api/v1/group/{uuid}/add:
+  /api/v1/groups/{uuid}/add/user:
     post:
       consumes:
       - application/json
@@ -404,7 +465,7 @@ paths:
       summary: Add user to group
       tags:
       - Group
-  /api/v1/group/{uuid}/remove/{userId}:
+  /api/v1/groups/{uuid}/remove/user/{userId}:
     delete:
       consumes:
       - application/json
@@ -423,8 +484,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
         "403":
           description: Forbidden
           schema:
@@ -438,68 +499,6 @@ paths:
           schema:
             $ref: '#/definitions/response.Error'
       summary: Remove user from group
-      tags:
-      - Group
-  /api/v1/group/create:
-    post:
-      consumes:
-      - application/json
-      description: creates new group
-      parameters:
-      - description: create group
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/request.CreateGroup'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/response.Group'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Error'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/response.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Error'
-      summary: Create new group
-      tags:
-      - Group
-  /api/v1/groups:
-    get:
-      consumes:
-      - application/json
-      description: Get paginated group list
-      parameters:
-      - description: default 1
-        in: query
-        name: page
-        type: integer
-      - description: default 20
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.GroupList'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Error'
-      summary: Get group list
       tags:
       - Group
 swagger: "2.0"

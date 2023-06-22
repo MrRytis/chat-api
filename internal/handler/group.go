@@ -20,7 +20,7 @@ import (
 // @Failure      400  {object}  response.Error
 // @Failure      422  {object}  response.Error
 // @Failure      500  {object}  response.Error
-// @Router       /api/v1/group/create [post]
+// @Router       /api/v1/groups [post]
 func CreateGroup(c *fiber.Ctx) error {
 	req := new(request.CreateGroup)
 	if err := c.BodyParser(req); err != nil {
@@ -113,7 +113,7 @@ func GetGroupList(c *fiber.Ctx) error {
 // @Param        uuid path string true "uuid of the group"
 // @Success      200  {object}  response.Group
 // @Failure      500  {object}  response.Error
-// @Router       /api/v1/group/{uuid} [get]
+// @Router       /api/v1/groups/{uuid} [get]
 func GetGroup(c *fiber.Ctx) error {
 	groupUuid := c.Params("group")
 
@@ -153,7 +153,7 @@ func GetGroup(c *fiber.Ctx) error {
 // @Failure      403  {object}  response.Error
 // @Failure      422  {object}  response.Error
 // @Failure      500  {object}  response.Error
-// @Router       /api/v1/group/{uuid} [put]
+// @Router       /api/v1/groups/{uuid} [put]
 func UpdateGroup(c *fiber.Ctx) error {
 	groupUuid := c.Params("group")
 
@@ -205,7 +205,7 @@ func UpdateGroup(c *fiber.Ctx) error {
 // @Success      204  {object}  nil
 // @Failure      403  {object}  response.Error
 // @Failure      500  {object}  response.Error
-// @Router       /api/v1/group/{uuid} [delete]
+// @Router       /api/v1/groups/{uuid} [delete]
 func DeleteGroup(c *fiber.Ctx) error {
 	groupUuid := c.Params("group")
 
@@ -233,7 +233,7 @@ func DeleteGroup(c *fiber.Ctx) error {
 // @Failure      404  {object}  response.Error
 // @Failure      422  {object}  response.Error
 // @Failure      500  {object}  response.Error
-// @Router       /api/v1/group/{uuid}/add [post]
+// @Router       /api/v1/groups/{uuid}/add/user [post]
 func AddUserToGroup(c *fiber.Ctx) error {
 	groupUuid := c.Params("group")
 
@@ -272,7 +272,33 @@ func AddUserToGroup(c *fiber.Ctx) error {
 // @Failure      403  {object}  response.Error
 // @Failure      404  {object}  response.Error
 // @Failure      500  {object}  response.Error
-// @Router       /api/v1/group/{uuid}/remove/{userId} [delete]
+// @Router       /api/v1/groups/{uuid}/remove/user/{userId} [delete]
 func RemoveUserFromGroup(c *fiber.Ctx) error {
-	return fiber.ErrNotImplemented
+	groupUuid := c.Params("group")
+	userUuid := c.Params("user")
+
+	group := repository.FindGroupByUuidAndUserId(groupUuid, c.Locals("userId").(int32))
+	user := repository.FindUserByUuid(userUuid)
+
+	if group.AdminId != c.Locals("userId").(int32) {
+		return fiber.ErrForbidden
+	}
+
+	var isRemoved bool
+	for i, u := range group.Users {
+		if u.UUID == user.UUID {
+			group.Users = append(group.Users[:i], group.Users[i+1:]...)
+			isRemoved = true
+
+			break
+		}
+	}
+
+	if !isRemoved {
+		return fiber.ErrNotFound
+	}
+
+	repository.UpdateGroup(group)
+
+	return c.Status(fiber.StatusNoContent).JSON(nil)
 }

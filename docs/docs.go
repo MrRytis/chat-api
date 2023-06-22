@@ -240,7 +240,48 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/group/create": {
+        "/api/v1/groups": {
+            "get": {
+                "description": "Get paginated group list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Group"
+                ],
+                "summary": "Get group list",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "default 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "default 20",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.GroupList"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "creates new group",
                 "consumes": [
@@ -292,7 +333,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/group/{uuid}": {
+        "/api/v1/groups/{uuid}": {
             "get": {
                 "description": "get single group by uuid",
                 "consumes": [
@@ -432,7 +473,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/group/{uuid}/add": {
+        "/api/v1/groups/{uuid}/add/user": {
             "post": {
                 "description": "Add user to group by uuid",
                 "consumes": [
@@ -494,7 +535,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/group/{uuid}/remove/{userId}": {
+        "/api/v1/groups/{uuid}/remove/user/{userId}": {
             "delete": {
                 "description": "Remove user from group by uuid",
                 "consumes": [
@@ -524,8 +565,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "204": {
+                        "description": "No Content"
                     },
                     "403": {
                         "description": "Forbidden",
@@ -537,49 +578,6 @@ const docTemplate = `{
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/response.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/groups": {
-            "get": {
-                "description": "Get paginated group list",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Group"
-                ],
-                "summary": "Get group list",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "default 1",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "default 20",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.GroupList"
                         }
                     },
                     "500": {
