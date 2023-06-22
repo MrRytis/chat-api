@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  request.CreateGroup:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
   request.Login:
     properties:
       email:
@@ -46,6 +53,13 @@ definitions:
     - name
     - password
     type: object
+  request.UserToGroup:
+    properties:
+      uuid:
+        type: string
+    required:
+    - uuid
+    type: object
   response.Auth:
     properties:
       accessToken:
@@ -62,11 +76,44 @@ definitions:
       message:
         type: string
     type: object
+  response.Group:
+    properties:
+      admin:
+        $ref: '#/definitions/response.User'
+      name:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/response.User'
+        type: array
+      uuid:
+        type: string
+    type: object
+  response.GroupList:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/response.Group'
+        type: array
+      itemsCount:
+        type: integer
+      pageNumber:
+        type: integer
+      pageSize:
+        type: integer
+    type: object
   response.Register:
     properties:
       message:
         type: string
       userId:
+        type: string
+    type: object
+  response.User:
+    properties:
+      name:
+        type: string
+      uuid:
         type: string
     type: object
 host: localhost:3000
@@ -223,4 +270,235 @@ paths:
       summary: Register new user
       tags:
       - Auth
+  /api/v1/groups:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated group list
+      parameters:
+      - description: default 1
+        in: query
+        name: page
+        type: integer
+      - description: default 20
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.GroupList'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Get group list
+      tags:
+      - Group
+    post:
+      consumes:
+      - application/json
+      description: creates new group
+      parameters:
+      - description: create group
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateGroup'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Group'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Create new group
+      tags:
+      - Group
+  /api/v1/groups/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: delete group by uuid
+      parameters:
+      - description: uuid of the group
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Delete group
+      tags:
+      - Group
+    get:
+      consumes:
+      - application/json
+      description: get single group by uuid
+      parameters:
+      - description: uuid of the group
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Group'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Get single group
+      tags:
+      - Group
+    put:
+      consumes:
+      - application/json
+      description: update group by uuid
+      parameters:
+      - description: update group
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateGroup'
+      - description: uuid of the group
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Group'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Update group
+      tags:
+      - Group
+  /api/v1/groups/{uuid}/add/user:
+    post:
+      consumes:
+      - application/json
+      description: Add user to group by uuid
+      parameters:
+      - description: uuid of the group
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.UserToGroup'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Add user to group
+      tags:
+      - Group
+  /api/v1/groups/{uuid}/remove/user/{userId}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove user from group by uuid
+      parameters:
+      - description: uuid of the group
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: uuid of the user
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Remove user from group
+      tags:
+      - Group
 swagger: "2.0"

@@ -1,6 +1,6 @@
 -- +goose Up
 -- SQL in section 'Up' is executed when this migration is applied
-CREATE TABLE refresh_token
+CREATE TABLE refresh_tokens
 (
     id         SERIAL PRIMARY KEY,
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -13,4 +13,4 @@ CREATE TABLE refresh_token
 
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
-DROP TABLE refresh_token;
+DROP TABLE refresh_tokens;

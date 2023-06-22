@@ -10,6 +10,6 @@ type RefreshToken struct {
 	UpdatedAt time.Time
 	ExpiresAt time.Time
 	UserId    uint   `gorm:"not null"`
-	User      User   `gorm:"foreignKey:UserId"`
+	User      User   `gorm:"foreignKey:user_id"`
 	Token     string `gorm:"not null"`
 }

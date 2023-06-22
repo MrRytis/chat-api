@@ -44,3 +44,18 @@ func SaveUser(user entity.User) {
 		log.Fatal(err, "Error saving user")
 	}
 }
+
+func FindUserByUuid(uuid string) *entity.User {
+	var users *entity.User
+
+	err := utils.Db.Where("uuid = ?", uuid).First(&users).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
+
+		log.Fatal(err, "Error finding users")
+	}
+
+	return users
+}

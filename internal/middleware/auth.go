@@ -23,9 +23,13 @@ func Auth(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "Token is blacklisted")
 	}
 
-	c.Locals("uuid", claims["uuid"].(string))
-	c.Locals("userId", claims["uid"].(uint))
-	c.Locals("expiresAt", int64(claims["expiresAt"].(float64)))
+	uuid := claims["uuid"].(string)
+	userId := int32(claims["uid"].(float64))
+	expiresAt := int64(claims["expiresAt"].(float64))
+
+	c.Locals("uuid", uuid)
+	c.Locals("userId", userId)
+	c.Locals("expiresAt", expiresAt)
 	c.Locals("jwt", tokenString)
 
 	return c.Next()
