@@ -5,9 +5,9 @@ import (
 	"github.com/MrRytis/chat-api/internal/entity"
 	"github.com/MrRytis/chat-api/internal/repository"
 	"github.com/MrRytis/chat-api/internal/utils"
+	"github.com/MrRytis/chat-api/pkg/exception"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"log"
 	"os"
 	"time"
 )
@@ -25,7 +25,7 @@ func CreateAccessToken(user entity.User) string {
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		log.Fatal(err)
+		exception.NewInternalServerError()
 	}
 
 	return tokenString
@@ -47,22 +47,24 @@ func CreateRefreshToken(user entity.User) string {
 	return token.Token
 }
 
-func RefreshToken(refreshToken string, accessToken string) (string, error) {
-	rt := repository.FindRefreshTokenByToken(refreshToken)
-	if rt == nil {
-		return "", fmt.Errorf("refresh token not found")
+func RefreshAccessToken(refreshToken string, accessToken string) string {
+	rt, err := repository.FindRefreshTokenByToken(refreshToken)
+	if err != nil {
+		exception.NewInternalServerError()
 	}
 
 	claims, err := ParseJWT(accessToken)
 	if err != nil {
-		log.Fatal(err)
+		exception.NewInternalServerError()
 	}
 
 	if rt.UserId != claims["uuid"].(uint) {
-		return "", fmt.Errorf("refresh token not valid")
+		exception.NewInternalServerError()
 	}
 
-	return CreateAccessToken(rt.User), nil
+	newAccessToken := CreateAccessToken(rt.User)
+
+	return newAccessToken
 }
 
 func ParseJWT(tokenString string) (jwt.MapClaims, error) {
@@ -72,7 +74,6 @@ func ParseJWT(tokenString string) (jwt.MapClaims, error) {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 
@@ -95,10 +96,6 @@ func IsBlacklisted(token string) bool {
 	}
 
 	return false
-}
-
-func ExpireRefreshToken(userId uint, token string) {
-	repository.ExpireRefreshToken(token, userId)
 }
 
 func blackListKey(token string) string {

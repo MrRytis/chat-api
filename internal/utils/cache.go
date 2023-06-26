@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"encoding/json"
+	"github.com/MrRytis/chat-api/pkg/exception"
 	"github.com/redis/go-redis/v9"
 	"log"
 	"os"
@@ -41,12 +42,12 @@ func GetFromCache(key string, values interface{}) interface{} {
 	}
 
 	if err != nil {
-		log.Fatal(err, "Error getting cache value")
+		exception.NewInternalServerError()
 	}
 
 	err = json.Unmarshal([]byte(val), values)
 	if err != nil {
-		log.Fatal(err, "Error unmarshalling cache value")
+		exception.NewInternalServerError()
 	}
 
 	return values

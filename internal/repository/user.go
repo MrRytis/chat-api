@@ -1,61 +1,47 @@
 package repository
 
 import (
-	"errors"
 	"github.com/MrRytis/chat-api/internal/entity"
 	"github.com/MrRytis/chat-api/internal/utils"
-	"gorm.io/gorm"
-	"log"
+	"github.com/MrRytis/chat-api/pkg/exception"
 )
 
-func FindUserById(id int32) *entity.User {
+func FindUserById(id int32) (entity.User, error) {
 	var user entity.User
 
 	err := utils.Db.Where("id = ?", id).First(&user).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil
-		}
-
-		log.Fatal(err, "Error finding user")
+		return entity.User{}, err
 	}
 
-	return &user
+	return user, nil
 }
 
-func FindUserByEmail(email string) *entity.User {
+func FindUserByEmail(email string) (entity.User, error) {
 	var user entity.User
 
 	err := utils.Db.Where("email = ?", email).First(&user).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil
-		}
-
-		log.Fatal(err, "Error finding user")
+		return user, err
 	}
 
-	return &user
+	return user, nil
 }
 
 func SaveUser(user entity.User) {
 	err := utils.Db.Create(&user).Error
 	if err != nil {
-		log.Fatal(err, "Error saving user")
+		exception.NewInternalServerError()
 	}
 }
 
-func FindUserByUuid(uuid string) *entity.User {
-	var users *entity.User
+func FindUserByUuid(uuid string) (entity.User, error) {
+	var users entity.User
 
 	err := utils.Db.Where("uuid = ?", uuid).First(&users).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil
-		}
-
-		log.Fatal(err, "Error finding users")
+		return entity.User{}, err
 	}
 
-	return users
+	return users, nil
 }

@@ -5,9 +5,11 @@ import (
 	"github.com/MrRytis/chat-api/internal/handler"
 	"github.com/MrRytis/chat-api/internal/router"
 	"github.com/MrRytis/chat-api/internal/utils"
+	"github.com/MrRytis/chat-api/pkg/exception"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/swagger"
+	"github.com/gofiber/template/html/v2"
 	"github.com/joho/godotenv"
 	"log"
 )
@@ -27,8 +29,10 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	engine := html.New("./views", ".html")
 	app := fiber.New(fiber.Config{
-		ErrorHandler: handler.ErrorHandler,
+		ErrorHandler: exception.Handler,
+		Views:        engine,
 	})
 
 	app.Use(recover.New())
@@ -38,8 +42,9 @@ func main() {
 
 	// Swagger
 	app.Get("/docs/*", swagger.HandlerDefault)
+	app.Get("/index.html", handler.IndexHandler)
 
 	router.NewRouter(app)
 
-	app.Listen(":3000")
+	log.Fatal(app.Listen(":3000"))
 }

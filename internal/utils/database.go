@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"errors"
+	"github.com/MrRytis/chat-api/pkg/exception"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -23,4 +25,14 @@ func NewDb() *gorm.DB {
 	Db = db
 
 	return db
+}
+
+func HandleDbError(err error) {
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			exception.NewNotFound("Record not found")
+		}
+
+		exception.NewInternalServerError()
+	}
 }

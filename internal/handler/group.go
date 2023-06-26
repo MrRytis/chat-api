@@ -2,9 +2,7 @@ package handler
 
 import (
 	"github.com/MrRytis/chat-api/internal/model/request"
-	"github.com/MrRytis/chat-api/internal/model/response"
-	"github.com/MrRytis/chat-api/internal/repository"
-	"github.com/MrRytis/chat-api/internal/service"
+	"github.com/MrRytis/chat-api/internal/service/groupService"
 	"github.com/MrRytis/chat-api/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -23,35 +21,11 @@ import (
 // @Router       /api/v1/groups [post]
 func CreateGroup(c *fiber.Ctx) error {
 	req := new(request.CreateGroup)
-	if err := c.BodyParser(req); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse JSON body")
-	}
+	utils.ParseBodyAndValidate(c, req)
 
-	err := utils.ValidateRequest(req)
-	if err != nil {
-		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
-	}
+	group := groupService.CreateGroup(req.Name, c.Locals("userId").(int32))
 
-	group := service.BuildGroup(req.Name, c.Locals("userId").(int32))
-	repository.CreateGroup(group)
-
-	var users []response.User
-	for _, user := range group.Users {
-		users = append(users, response.User{
-			Uuid: user.UUID,
-			Name: user.Name,
-		})
-	}
-
-	return c.Status(fiber.StatusCreated).JSON(response.Group{
-		Uuid: group.Uuid,
-		Name: group.Name,
-		Admin: response.User{
-			Uuid: group.Admin.UUID,
-			Name: group.Admin.Name,
-		},
-		Users: users,
-	})
+	return c.Status(fiber.StatusCreated).JSON(groupService.BuildGroupDTO(group))
 }
 
 // GetGroupList godoc
@@ -77,31 +51,17 @@ func GetGroupList(c *fiber.Ctx) error {
 		page = 1
 	}
 
-	groups, total := repository.FindPagedGroupsByUserId(page, limit, c.Locals("userId").(int32))
+	groups := groupService.GetUsersGroups(c.Locals("userId").(int32), page, limit)
+	total := groupService.GetTotalUserGroupCount(c.Locals("userId").(int32))
 
-	var responseGroups []response.Group
-	for _, group := range groups {
-		var users []response.User
-
-		responseGroups = append(responseGroups, response.Group{
-			Uuid: group.Uuid,
-			Name: group.Name,
-			Admin: response.User{
-				Uuid: group.Admin.UUID,
-				Name: group.Admin.Name,
-			},
-			Users: users,
-		})
-	}
-
-	groupList := response.GroupList{
-		PageNumber: int32(page),
-		PageSize:   int32(limit),
-		ItemsCount: int32(total),
-		Items:      responseGroups,
-	}
-
-	return c.Status(fiber.StatusOK).JSON(groupList)
+	return c.Status(fiber.StatusOK).JSON(
+		groupService.BuildGroupDTOs(
+			groups,
+			total,
+			page,
+			limit,
+		),
+	)
 }
 
 // GetGroup godoc
@@ -117,27 +77,9 @@ func GetGroupList(c *fiber.Ctx) error {
 func GetGroup(c *fiber.Ctx) error {
 	groupUuid := c.Params("group")
 
-	group := repository.FindGroupByUuidAndUserId(groupUuid, c.Locals("userId").(int32))
+	group := groupService.GetUserGroupByUuid(groupUuid, c.Locals("userId").(int32))
 
-	var users []response.User
-	for _, user := range group.Users {
-		users = append(users, response.User{
-			Uuid: user.UUID,
-			Name: user.Name,
-		})
-	}
-
-	responseGroup := response.Group{
-		Uuid: group.Uuid,
-		Name: group.Name,
-		Admin: response.User{
-			Uuid: group.Admin.UUID,
-			Name: group.Admin.Name,
-		},
-		Users: users,
-	}
-
-	return c.Status(fiber.StatusOK).JSON(responseGroup)
+	return c.Status(fiber.StatusOK).JSON(groupService.BuildGroupDTO(group))
 }
 
 // UpdateGroup godoc
@@ -155,44 +97,13 @@ func GetGroup(c *fiber.Ctx) error {
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/groups/{uuid} [put]
 func UpdateGroup(c *fiber.Ctx) error {
+	req := new(request.CreateGroup)
+	utils.ParseBodyAndValidate(c, req)
 	groupUuid := c.Params("group")
 
-	req := new(request.CreateGroup)
-	if err := c.BodyParser(req); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse JSON body")
-	}
+	group := groupService.UpdateGroup(groupUuid, c.Locals("userId").(int32), req.Name)
 
-	err := utils.ValidateRequest(req)
-	if err != nil {
-		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
-	}
-
-	group := repository.FindGroupByUuidAndUserId(groupUuid, c.Locals("userId").(int32))
-
-	if group.AdminId != c.Locals("userId").(int32) {
-		return fiber.ErrForbidden
-	}
-
-	group.Name = req.Name
-
-	repository.UpdateGroup(group)
-
-	var users []response.User
-	for _, user := range group.Users {
-		users = append(users, response.User{
-			Uuid: user.UUID,
-			Name: user.Name,
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(response.Group{
-		Uuid: group.Uuid,
-		Name: group.Name,
-		Admin: response.User{
-			Uuid: group.Admin.UUID,
-		},
-		Users: users,
-	})
+	return c.Status(fiber.StatusOK).JSON(groupService.BuildGroupDTO(group))
 }
 
 // DeleteGroup godoc
@@ -209,13 +120,7 @@ func UpdateGroup(c *fiber.Ctx) error {
 func DeleteGroup(c *fiber.Ctx) error {
 	groupUuid := c.Params("group")
 
-	group := repository.FindGroupByUuidAndUserId(groupUuid, c.Locals("userId").(int32))
-
-	if group.AdminId != c.Locals("userId").(int32) {
-		return fiber.ErrForbidden
-	}
-
-	repository.DeleteGroup(*group)
+	groupService.DeleteGroup(groupUuid, c.Locals("userId").(int32))
 
 	return c.Status(fiber.StatusNoContent).JSON(nil)
 }
@@ -228,36 +133,20 @@ func DeleteGroup(c *fiber.Ctx) error {
 // @Produce      json
 // @Param        uuid path string true "uuid of the group"
 // @Param        req body request.UserToGroup true "body"
-// @Success      200  {object}  nil
+// @Success      200  {object}  response.GroupUserAdded
 // @Failure      400  {object}  response.Error
 // @Failure      404  {object}  response.Error
 // @Failure      422  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/groups/{uuid}/add/user [post]
 func AddUserToGroup(c *fiber.Ctx) error {
+	req := new(request.UserToGroup)
+	utils.ParseBodyAndValidate(c, req)
 	groupUuid := c.Params("group")
 
-	req := new(request.UserToGroup)
+	group := groupService.AddUserToGroup(groupUuid, c.Locals("userId").(int32), req.Uuid)
 
-	if err := c.BodyParser(req); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse JSON body")
-	}
-
-	err := utils.ValidateRequest(req)
-	if err != nil {
-		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
-	}
-
-	group := repository.FindGroupByUuidAndUserId(groupUuid, c.Locals("userId").(int32))
-	user := repository.FindUserByUuid(req.Uuid)
-
-	group.Users = append(group.Users, *user)
-
-	repository.UpdateGroup(group)
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "User added to group",
-	})
+	return c.Status(fiber.StatusOK).JSON(groupService.BuildUserAddedDTO(group, req.Uuid))
 }
 
 // RemoveUserFromGroup godoc
@@ -277,28 +166,7 @@ func RemoveUserFromGroup(c *fiber.Ctx) error {
 	groupUuid := c.Params("group")
 	userUuid := c.Params("user")
 
-	group := repository.FindGroupByUuidAndUserId(groupUuid, c.Locals("userId").(int32))
-	user := repository.FindUserByUuid(userUuid)
-
-	if group.AdminId != c.Locals("userId").(int32) {
-		return fiber.ErrForbidden
-	}
-
-	var isRemoved bool
-	for i, u := range group.Users {
-		if u.UUID == user.UUID {
-			group.Users = append(group.Users[:i], group.Users[i+1:]...)
-			isRemoved = true
-
-			break
-		}
-	}
-
-	if !isRemoved {
-		return fiber.ErrNotFound
-	}
-
-	repository.UpdateGroup(group)
+	groupService.RemoveUserFromGroup(groupUuid, c.Locals("userId").(int32), userUuid)
 
 	return c.Status(fiber.StatusNoContent).JSON(nil)
 }

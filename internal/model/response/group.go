@@ -18,3 +18,9 @@ type GroupList struct {
 	ItemsCount int32   `json:"itemsCount"`
 	Items      []Group `json:"items"`
 }
+
+type GroupUserAdded struct {
+	Uuid    string `json:"uuid"`
+	User    User   `json:"user"`
+	Message string `json:"message"`
+}
