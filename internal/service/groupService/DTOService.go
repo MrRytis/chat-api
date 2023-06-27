@@ -61,5 +61,6 @@ func findUserInListByUuid(group entity.Group, uuid string) entity.User {
 	}
 
 	exception.NewInternalServerError()
+
 	return entity.User{}
 }
