@@ -102,6 +102,15 @@ definitions:
       pageSize:
         type: integer
     type: object
+  response.GroupUserAdded:
+    properties:
+      message:
+        type: string
+      user:
+        $ref: '#/definitions/response.User'
+      uuid:
+        type: string
+    type: object
   response.Register:
     properties:
       message:
@@ -446,6 +455,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.GroupUserAdded'
         "400":
           description: Bad Request
           schema:

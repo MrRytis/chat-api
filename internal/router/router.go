@@ -9,6 +9,8 @@ import (
 func NewRouter(app *fiber.App) {
 	api := app.Group("/api")
 
+	api.Get("/health", handler.HealthCheck)
+
 	apiV1 := api.Group("/v1")
 
 	auth := apiV1.Group("/auth")

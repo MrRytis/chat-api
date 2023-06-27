@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/MrRytis/chat-api/internal/entity"
 	"github.com/MrRytis/chat-api/internal/utils"
+	"github.com/MrRytis/chat-api/pkg/exception"
 	"gorm.io/gorm"
 	"log"
 	"time"
@@ -12,7 +13,7 @@ import (
 func CreateRefreshToken(refreshToken entity.RefreshToken) entity.RefreshToken {
 	err := utils.Db.Create(&refreshToken).Error
 	if err != nil {
-		log.Fatal(err, "Error saving refresh token")
+		exception.NewInternalServerError()
 	}
 
 	return refreshToken
@@ -38,17 +39,13 @@ func ExpireRefreshToken(token string, userId uint) {
 	}
 }
 
-func FindRefreshTokenByToken(token string) *entity.RefreshToken {
-	var refreshToken *entity.RefreshToken
+func FindRefreshTokenByToken(token string) (entity.RefreshToken, error) {
+	var refreshToken entity.RefreshToken
 
 	err := utils.Db.Where("token = ? AND expires_at > ?", token, time.Now()).First(&refreshToken).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil
-		}
-
-		log.Fatal(err, "Error finding refresh token")
+		return entity.RefreshToken{}, err
 	}
 
-	return refreshToken
+	return refreshToken, nil
 }

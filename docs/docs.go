@@ -506,7 +506,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.GroupUserAdded"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -741,6 +744,20 @@ const docTemplate = `{
                 },
                 "pageSize": {
                     "type": "integer"
+                }
+            }
+        },
+        "response.GroupUserAdded": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/response.User"
+                },
+                "uuid": {
+                    "type": "string"
                 }
             }
         },
