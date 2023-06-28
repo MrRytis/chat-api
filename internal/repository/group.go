@@ -1,10 +1,8 @@
 package repository
 
 import (
-	"errors"
 	"github.com/MrRytis/chat-api/internal/entity"
 	"github.com/MrRytis/chat-api/internal/utils"
-	"gorm.io/gorm"
 	"log"
 )
 
@@ -17,7 +15,7 @@ func CreateGroup(group entity.Group) entity.Group {
 	return group
 }
 
-func FindPagedGroupsByUserId(page int, limit int, userId int32) []entity.Group {
+func FindPagedGroupsByUserId(page int, limit int, userId int32) ([]entity.Group, error) {
 	var groups []entity.Group
 
 	err := utils.Db.
@@ -32,17 +30,13 @@ func FindPagedGroupsByUserId(page int, limit int, userId int32) []entity.Group {
 		Error
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return []entity.Group{}
-		}
-
-		log.Fatal(err, "Error finding groups")
+		return groups, err
 	}
 
-	return groups
+	return groups, nil
 }
 
-func GetTotalUserGroupCount(userId int32) int64 {
+func GetTotalUserGroupCount(userId int32) (int64, error) {
 	var total int64
 	err := utils.Db.
 		Model(&entity.Group{}).
@@ -51,23 +45,23 @@ func GetTotalUserGroupCount(userId int32) int64 {
 		Where("users.id in (?)", userId).
 		Count(&total).
 		Error
+
 	if err != nil {
-		log.Fatal(err, "Error counting groups")
+		return total, err
 	}
 
-	return total
+	return total, nil
 }
 
-func FindGroupByUuidAndUserId(uuid string, userId int32) (entity.Group, error) {
+func FindGroupByUuid(uuid string) (entity.Group, error) {
 	var group entity.Group
 
 	err := utils.Db.
-		Joins("JOIN group_users ON group_users.group_id = groups.id").
-		Joins("JOIN users ON users.id = group_users.user_id").
-		Where("groups.uuid = ? AND users.id in (?)", uuid, userId).
+		Where("uuid = ?", uuid).
 		Preload("Users").
 		Preload("Admin").
-		First(&group).Error
+		First(&group).
+		Error
 
 	if err != nil {
 		return entity.Group{}, err

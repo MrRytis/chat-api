@@ -27,4 +27,11 @@ func NewRouter(app *fiber.App) {
 	group.Delete("/:group", handler.DeleteGroup)
 	group.Post("/:group/add/user", handler.AddUserToGroup)
 	group.Delete("/:group/remove/user/:user", handler.RemoveUserFromGroup)
+
+	message := apiV1.Group("group/{group}/messages", middleware.Auth)
+	message.Post("/", handler.CreateMessage)
+	message.Get("/", handler.GetMessageList)
+	message.Get("/:message", handler.GetMessage)
+	message.Put("/:message", handler.UpdateMessage)
+	message.Delete("/:message", handler.DeleteMessage)
 }

@@ -18,7 +18,7 @@ func RegisterUser(email string, password string, name string) entity.User {
 
 func FindUserByEmailAndPassword(email string, password string) entity.User {
 	user, err := repository.FindUserByEmail(email)
-	utils.HandleDbError(err)
+	utils.HandleDbError(err, "User", email)
 
 	if CheckUserPassword(password, user.Password) != nil {
 		exception.NewUnauthorized("Invalid credentials")

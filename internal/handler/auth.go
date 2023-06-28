@@ -67,6 +67,7 @@ func Login(c *fiber.Ctx) error {
 // @Tags         Auth
 // @Accept       json
 // @Produce      json
+// @Param		 Authorization header string true "Bearer token"
 // @Param        req body request.Logout true "logout"
 // @Success      204  {object}  nil
 // @Failure      400  {object}  response.Error
@@ -93,6 +94,7 @@ func Logout(c *fiber.Ctx) error {
 // @Tags         Auth
 // @Accept       json
 // @Produce      json
+// @Param		 Authorization header string true "Bearer token"
 // @Param        req body request.Refresh true "refresh"
 // @Success      200  {object}  response.Auth
 // @Failure      400  {object}  response.Error

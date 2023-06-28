@@ -26,6 +26,13 @@ definitions:
     required:
     - refreshToken
     type: object
+  request.Message:
+    properties:
+      content:
+        type: string
+    required:
+    - content
+    type: object
   request.Refresh:
     properties:
       accessToken:
@@ -73,6 +80,10 @@ definitions:
     properties:
       code:
         type: integer
+      errors:
+        items:
+          $ref: '#/definitions/response.ValidationError'
+        type: array
       message:
         type: string
     type: object
@@ -111,6 +122,28 @@ definitions:
       uuid:
         type: string
     type: object
+  response.Message:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      is_edited:
+        type: boolean
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/response.MessageUser'
+      uuid:
+        type: string
+    type: object
+  response.MessageUser:
+    properties:
+      name:
+        type: string
+      uuid:
+        type: string
+    type: object
   response.Register:
     properties:
       message:
@@ -123,6 +156,13 @@ definitions:
       name:
         type: string
       uuid:
+        type: string
+    type: object
+  response.ValidationError:
+    properties:
+      field:
+        type: string
+      message:
         type: string
     type: object
 host: localhost:3000
@@ -181,6 +221,11 @@ paths:
       - application/json
       description: logout user
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: logout
         in: body
         name: req
@@ -213,6 +258,11 @@ paths:
       - application/json
       description: refreshes auth token
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: refresh
         in: body
         name: req
@@ -285,6 +335,11 @@ paths:
       - application/json
       description: Get paginated group list
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: default 1
         in: query
         name: page
@@ -300,6 +355,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.GroupList'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Error'
         "500":
           description: Internal Server Error
           schema:
@@ -312,6 +371,11 @@ paths:
       - application/json
       description: creates new group
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: create group
         in: body
         name: req
@@ -340,12 +404,228 @@ paths:
       summary: Create new group
       tags:
       - Group
+  /api/v1/groups/{group}/messages:
+    get:
+      consumes:
+      - application/json
+      description: get paginated list of messages
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: uuid of the group
+        in: path
+        name: group
+        required: true
+        type: string
+      - description: default 1
+        in: query
+        name: page
+        type: integer
+      - description: default 20
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Group'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Get list of messages
+      tags:
+      - Message
+    post:
+      consumes:
+      - application/json
+      description: creates a new message to specified group
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: message
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.Message'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Message'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Create new message in group
+      tags:
+      - Message
+  /api/v1/groups/{group}/messages/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: delete single message by uuid
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: uuid of the group
+        in: path
+        name: group
+        required: true
+        type: string
+      - description: uuid of the message
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Group'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Delete single message
+      tags:
+      - Message
+    get:
+      consumes:
+      - application/json
+      description: get single message by uuid
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: uuid of the group
+        in: path
+        name: group
+        required: true
+        type: string
+      - description: uuid of the message
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Group'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Get single message
+      tags:
+      - Message
+    put:
+      consumes:
+      - application/json
+      description: update single message by uuid
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: uuid of the group
+        in: path
+        name: group
+        required: true
+        type: string
+      - description: uuid of the message
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Group'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
+      summary: Update single message
+      tags:
+      - Message
   /api/v1/groups/{uuid}:
     delete:
       consumes:
       - application/json
       description: delete group by uuid
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: uuid of the group
         in: path
         name: uuid
@@ -360,6 +640,10 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/response.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Error'
         "500":
           description: Internal Server Error
           schema:
@@ -372,6 +656,11 @@ paths:
       - application/json
       description: get single group by uuid
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: uuid of the group
         in: path
         name: uuid
@@ -384,6 +673,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Group'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Error'
         "500":
           description: Internal Server Error
           schema:
@@ -396,6 +693,11 @@ paths:
       - application/json
       description: update group by uuid
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: update group
         in: body
         name: req
@@ -422,6 +724,10 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/response.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Error'
         "422":
           description: Unprocessable Entity
           schema:
@@ -439,6 +745,11 @@ paths:
       - application/json
       description: Add user to group by uuid
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: uuid of the group
         in: path
         name: uuid
@@ -459,6 +770,10 @@ paths:
             $ref: '#/definitions/response.GroupUserAdded'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/response.Error'
         "404":
@@ -482,6 +797,11 @@ paths:
       - application/json
       description: Remove user from group by uuid
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: uuid of the group
         in: path
         name: uuid
@@ -512,4 +832,6 @@ paths:
       summary: Remove user from group
       tags:
       - Group
+schemes:
+- http
 swagger: "2.0"

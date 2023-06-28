@@ -13,6 +13,7 @@ import (
 // @Tags         Group
 // @Accept       json
 // @Produce      json
+// @Param		 Authorization header string true "Bearer token"
 // @Param        req body request.CreateGroup true "create group"
 // @Success      201  {object}  response.Group
 // @Failure      400  {object}  response.Error
@@ -34,9 +35,11 @@ func CreateGroup(c *fiber.Ctx) error {
 // @Tags         Group
 // @Accept       json
 // @Produce      json
+// @Param		 Authorization header string true "Bearer token"
 // @Param        page query int false "default 1"
 // @Param        limit query int false "default 20"
 // @Success      200  {object}  response.GroupList
+// @Failure      403  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/groups [get]
 func GetGroupList(c *fiber.Ctx) error {
@@ -55,7 +58,7 @@ func GetGroupList(c *fiber.Ctx) error {
 	total := groupService.GetTotalUserGroupCount(c.Locals("userId").(int32))
 
 	return c.Status(fiber.StatusOK).JSON(
-		groupService.BuildGroupDTOs(
+		groupService.BuildGroupListDTO(
 			groups,
 			total,
 			page,
@@ -70,8 +73,11 @@ func GetGroupList(c *fiber.Ctx) error {
 // @Tags         Group
 // @Accept       json
 // @Produce      json
+// @Param		 Authorization header string true "Bearer token"
 // @Param        uuid path string true "uuid of the group"
 // @Success      200  {object}  response.Group
+// @Success      403  {object}  response.Error
+// @Success      404  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/groups/{uuid} [get]
 func GetGroup(c *fiber.Ctx) error {
@@ -88,11 +94,13 @@ func GetGroup(c *fiber.Ctx) error {
 // @Tags         Group
 // @Accept       json
 // @Produce      json
+// @Param		 Authorization header string true "Bearer token"
 // @Param        req body request.CreateGroup true "update group"
 // @Param        uuid path string true "uuid of the group"
 // @Success      200  {object}  response.Group
 // @Failure      400  {object}  response.Error
 // @Failure      403  {object}  response.Error
+// @Failure      404  {object}  response.Error
 // @Failure      422  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/groups/{uuid} [put]
@@ -112,9 +120,11 @@ func UpdateGroup(c *fiber.Ctx) error {
 // @Tags         Group
 // @Accept       json
 // @Produce      json
+// @Param		 Authorization header string true "Bearer token"
 // @Param        uuid path string true "uuid of the group"
 // @Success      204  {object}  nil
 // @Failure      403  {object}  response.Error
+// @Failure      404  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/groups/{uuid} [delete]
 func DeleteGroup(c *fiber.Ctx) error {
@@ -131,10 +141,12 @@ func DeleteGroup(c *fiber.Ctx) error {
 // @Tags         Group
 // @Accept       json
 // @Produce      json
+// @Param		 Authorization header string true "Bearer token"
 // @Param        uuid path string true "uuid of the group"
 // @Param        req body request.UserToGroup true "body"
 // @Success      200  {object}  response.GroupUserAdded
 // @Failure      400  {object}  response.Error
+// @Failure      403  {object}  response.Error
 // @Failure      404  {object}  response.Error
 // @Failure      422  {object}  response.Error
 // @Failure      500  {object}  response.Error
@@ -155,6 +167,7 @@ func AddUserToGroup(c *fiber.Ctx) error {
 // @Tags         Group
 // @Accept       json
 // @Produce      json
+// @Param		 Authorization header string true "Bearer token"
 // @Param        uuid path string true "uuid of the group"
 // @Param        userId path string true "uuid of the user"
 // @Success      204  {object}  nil

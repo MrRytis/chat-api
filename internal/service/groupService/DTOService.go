@@ -26,7 +26,7 @@ func BuildGroupDTO(group entity.Group) response.Group {
 	}
 }
 
-func BuildGroupDTOs(groups []entity.Group, total int64, page int, limit int) response.GroupList {
+func BuildGroupListDTO(groups []entity.Group, total int64, page int, limit int) response.GroupList {
 	var groupDTOs []response.Group
 	for _, group := range groups {
 		groupDTOs = append(groupDTOs, BuildGroupDTO(group))

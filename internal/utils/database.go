@@ -27,12 +27,26 @@ func NewDb() *gorm.DB {
 	return db
 }
 
-func HandleDbError(err error) {
+func HandleDbError(err error, table string, params ...interface{}) {
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			exception.NewNotFound("Record not found")
+			exception.NewNotFound(buildNotFoundMessage(table, params...))
 		}
 
 		exception.NewInternalServerError()
 	}
+}
+
+func buildNotFoundMessage(table string, params ...interface{}) string {
+	message := "Record not found"
+
+	if len(params) > 0 {
+		message += " for " + table + " with params: "
+
+		for _, param := range params {
+			message += param.(string) + " "
+		}
+	}
+
+	return message
 }
