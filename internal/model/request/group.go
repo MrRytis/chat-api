@@ -1,6 +1,6 @@
 package request
 
-type CreateGroup struct {
+type Group struct {
 	Name string `json:"name" validate:"required"`
 }
 

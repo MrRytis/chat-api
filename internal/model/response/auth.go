@@ -10,3 +10,8 @@ type Auth struct {
 	RefreshToken string `json:"refreshToken"`
 	ExpiresAt    string `json:"expiresAt"`
 }
+
+type User struct {
+	Uuid string `json:"uuid"`
+	Name string `json:"name"`
+}

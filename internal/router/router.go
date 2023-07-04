@@ -3,10 +3,13 @@ package router
 import (
 	"github.com/MrRytis/chat-api/internal/handler"
 	"github.com/MrRytis/chat-api/internal/middleware"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
 
 func NewRouter(app *fiber.App) {
+	websocketRouter(app)
+
 	api := app.Group("/api")
 
 	api.Get("/health", handler.HealthCheck)
@@ -34,4 +37,9 @@ func NewRouter(app *fiber.App) {
 	message.Get("/:message", handler.GetMessage)
 	message.Put("/:message", handler.UpdateMessage)
 	message.Delete("/:message", handler.DeleteMessage)
+}
+
+func websocketRouter(app *fiber.App) {
+	ws := app.Group("/ws", middleware.WebsocketProtocol, middleware.Auth)
+	ws.Get("/", websocket.New(handler.Websockets))
 }

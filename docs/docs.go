@@ -122,6 +122,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Error"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
@@ -295,6 +301,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.GroupList"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -335,7 +347,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.CreateGroup"
+                            "$ref": "#/definitions/request.Group"
                         }
                     }
                 ],
@@ -348,6 +360,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/response.Error"
                         }
@@ -415,6 +433,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Group"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -468,6 +492,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/response.Error"
                         }
@@ -536,6 +566,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Group"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -596,6 +632,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/response.Group"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "403": {
@@ -660,6 +702,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Group"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -717,6 +765,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Group"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -763,7 +817,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.CreateGroup"
+                            "$ref": "#/definitions/request.Group"
                         }
                     },
                     {
@@ -783,6 +837,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/response.Error"
                         }
@@ -844,6 +904,12 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
                     },
                     "403": {
                         "description": "Forbidden",
@@ -917,6 +983,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Error"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -984,6 +1056,12 @@ const docTemplate = `{
                     "204": {
                         "description": "No Content"
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -1004,10 +1082,54 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/ws": {
+            "get": {
+                "description": "Websockets connection to receive messages in real-time",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Websockets"
+                ],
+                "summary": "Websockets for real-time communication",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.WebsocketMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "request.CreateGroup": {
+        "request.Group": {
             "type": "object",
             "required": [
                 "name"
@@ -1177,6 +1299,32 @@ const docTemplate = `{
                 }
             }
         },
+        "response.GroupMessage": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "group": {
+                    "$ref": "#/definitions/response.SimpleGroup"
+                },
+                "is_edited": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/response.User"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
         "response.GroupUserAdded": {
             "type": "object",
             "properties": {
@@ -1194,31 +1342,20 @@ const docTemplate = `{
         "response.Message": {
             "type": "object",
             "properties": {
-                "content": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
                 "is_edited": {
                     "type": "boolean"
                 },
+                "message": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/response.MessageUser"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.MessageUser": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
+                    "$ref": "#/definitions/response.User"
                 },
                 "uuid": {
                     "type": "string"
@@ -1232,6 +1369,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.SimpleGroup": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "uuid": {
                     "type": "string"
                 }
             }
@@ -1255,6 +1403,17 @@ const docTemplate = `{
                 },
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "response.WebsocketMessage": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "data": {
+                    "$ref": "#/definitions/response.GroupMessage"
                 }
             }
         }

@@ -71,6 +71,7 @@ func Login(c *fiber.Ctx) error {
 // @Param        req body request.Logout true "logout"
 // @Success      204  {object}  nil
 // @Failure      400  {object}  response.Error
+// @Failure      401  {object}  response.Error
 // @Failure      422  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/auth/logout [post]

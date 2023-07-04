@@ -6,7 +6,7 @@ import (
 )
 
 func BuildMessageDTO(message entity.Message) response.Message {
-	user := response.MessageUser{
+	user := response.User{
 		Uuid: message.User.UUID,
 		Name: message.User.Name,
 	}

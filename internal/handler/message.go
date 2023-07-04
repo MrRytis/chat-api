@@ -17,6 +17,7 @@ import (
 // @Param        req body request.Message true "message"
 // @Success      201  {object}  response.Message
 // @Failure      400  {object}  response.Error
+// @Failure      401  {object}  response.Error
 // @Failure      403  {object}  response.Error
 // @Failure      422  {object}  response.Error
 // @Failure      500  {object}  response.Error
@@ -44,6 +45,7 @@ func CreateMessage(c *fiber.Ctx) error {
 // @Param        page query int false "default 1"
 // @Param        limit query int false "default 20"
 // @Success      200  {object}  response.Group
+// @Failure      401  {object}  response.Error
 // @Failure      403  {object}  response.Error
 // @Failure      500  {object}  response.Error
 // @Router       /api/v1/groups/{group}/messages [get]
@@ -84,6 +86,7 @@ func GetMessageList(c *fiber.Ctx) error {
 // @Param        group path string true "uuid of the group"
 // @Param        uuid path string true "uuid of the message"
 // @Success      200  {object}  response.Group
+// @Failure      401  {object}  response.Error
 // @Failure      403  {object}  response.Error
 // @Failure      404  {object}  response.Error
 // @Failure      500  {object}  response.Error
@@ -108,6 +111,7 @@ func GetMessage(c *fiber.Ctx) error {
 // @Param        group path string true "uuid of the group"
 // @Param        uuid path string true "uuid of the message"
 // @Success      200  {object}  response.Group
+// @Failure      401  {object}  response.Error
 // @Failure      403  {object}  response.Error
 // @Failure      404  {object}  response.Error
 // @Failure      500  {object}  response.Error
@@ -135,6 +139,7 @@ func UpdateMessage(c *fiber.Ctx) error {
 // @Param        group path string true "uuid of the group"
 // @Param        uuid path string true "uuid of the message"
 // @Success      200  {object}  response.Group
+// @Failure      401  {object}  response.Error
 // @Failure      403  {object}  response.Error
 // @Failure      404  {object}  response.Error
 // @Failure      500  {object}  response.Error
